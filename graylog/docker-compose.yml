@@ -1,0 +1,25 @@
+version: '2'
+services:
+  mongo:
+    image: "mongo"
+    volumes:
+      - /data/db:/data/db
+  elasticsearch:
+    image: "elasticsearch:2"
+    command: "elasticsearch -Des.cluster.name='graylog'"
+    volumes:
+      - /graylog/data/elasticsearch:/usr/share/elasticsearch/data
+  graylog:
+    image: graylog2/server:2.1.1-1
+    volumes:
+      - /graylog/data/journal:/usr/share/graylog/data/journal
+      - /graylog/config:/usr/share/graylog/data/config
+    environment:
+      GRAYLOG_WEB_ENDPOINT_URI: http://127.0.0.1:9000/api
+    links:
+      - mongo:mongo
+      - elasticsearch:elasticsearch
+    ports:
+      - "9000:9000"
+      - "12201/udp:12201/udp"
+      - "1514/udp:1514/udp"
